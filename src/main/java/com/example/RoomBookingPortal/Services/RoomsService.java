@@ -28,11 +28,11 @@ public class RoomsService {
 //    }
     public ResponseEntity<?> addRoom(RoomDTO roomDTO) {
         if (roomsRepository.existsByRoomName(roomDTO.getRoomName())) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room already exists");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Room already exists");
         }
 
         if (roomDTO.getRoomCapacity() <= 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid capacity");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid capacity");
         }
 
         Room room = new Room();
@@ -50,7 +50,7 @@ public class RoomsService {
         }
 
         if (roomDTO.getRoomCapacity() <= 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid capacity");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid capacity");
         }
 
         room.setRoomName(roomDTO.getRoomName());

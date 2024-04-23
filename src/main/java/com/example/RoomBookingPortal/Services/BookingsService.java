@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Date;
 
 @Service
 public class BookingsService {
@@ -60,7 +61,7 @@ public class BookingsService {
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
         // Validate time format
@@ -70,12 +71,12 @@ public class BookingsService {
             timeFormat.parse(bookingDTO.getTimeFrom());
             timeFormat.parse(bookingDTO.getTimeTo());
         } catch (ParseException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
         // Check if timeFrom is before timeTo
         if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
         // Check room availability
@@ -87,7 +88,7 @@ public class BookingsService {
         );
 
         if (!conflictingBookings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room unavailable");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Room unavailable");
         }
 
         // Create and save the booking
@@ -136,7 +137,7 @@ public class BookingsService {
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
 
@@ -147,12 +148,12 @@ public class BookingsService {
             timeFormat.parse(bookingDTO.getTimeFrom());
             timeFormat.parse(bookingDTO.getTimeTo());
         } catch (ParseException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
         // Check if timeFrom is before timeTo
         if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
         }
 
         // Check room availability
@@ -165,7 +166,7 @@ public class BookingsService {
         );
 
         if (!conflictingBookings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room unavailable");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Room unavailable");
         }
 
         // Update booking details
@@ -190,7 +191,7 @@ public class BookingsService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking does not exist");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Booking does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking does not exist");
         }
     }
 

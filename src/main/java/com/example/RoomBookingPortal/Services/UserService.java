@@ -21,7 +21,7 @@ public class UserService {
 
     public ResponseEntity<?> signUp(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Forbidden, Account already exists");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden, Account already exists");
         }
 
         user.setEmail(user.getEmail());

@@ -1,16 +1,12 @@
 package com.example.RoomBookingPortal.Services;
 
-import com.example.RoomBookingPortal.APIEndpoints.Rooms.RoomDTO;
-import com.example.RoomBookingPortal.APIEndpoints.Rooms.RoomFiltersDTO;
-import com.example.RoomBookingPortal.DatabaseTables.Room;
+import com.example.RoomBookingPortal.Models.DTOs.RoomDTO;
+import com.example.RoomBookingPortal.Models.DatabaseTables.Room;
 import com.example.RoomBookingPortal.Repositories.RoomsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class RoomsService {

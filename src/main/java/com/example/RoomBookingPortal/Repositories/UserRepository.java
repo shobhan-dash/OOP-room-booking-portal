@@ -1,6 +1,6 @@
 package com.example.RoomBookingPortal.Repositories;
 
-import com.example.RoomBookingPortal.DatabaseTables.User;
+import com.example.RoomBookingPortal.Models.DatabaseTables.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

@@ -1,11 +1,10 @@
 package com.example.RoomBookingPortal.Services;
 
-import com.example.RoomBookingPortal.APIEndpoints.Bookings.BookingDTO;
-import com.example.RoomBookingPortal.APIEndpoints.Bookings.UserBookingRecordsDTO;
-import com.example.RoomBookingPortal.APIEndpoints.Rooms.RoomDTO;
-import com.example.RoomBookingPortal.DatabaseTables.Booking;
-import com.example.RoomBookingPortal.DatabaseTables.Room;
-import com.example.RoomBookingPortal.DatabaseTables.User;
+import com.example.RoomBookingPortal.Models.DTOs.BookingDTO;
+import com.example.RoomBookingPortal.Models.DTOs.UserBookingRecordsDTO;
+import com.example.RoomBookingPortal.Models.DatabaseTables.Booking;
+import com.example.RoomBookingPortal.Models.DatabaseTables.Room;
+import com.example.RoomBookingPortal.Models.DatabaseTables.User;
 import com.example.RoomBookingPortal.Repositories.BookingsRepository;
 import com.example.RoomBookingPortal.Repositories.RoomsRepository;
 import com.example.RoomBookingPortal.Repositories.UserRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

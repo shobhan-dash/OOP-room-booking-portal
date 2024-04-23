@@ -1,11 +1,10 @@
-package com.example.RoomBookingPortal.APIEndpoints.Rooms;
+package com.example.RoomBookingPortal.APIEndpoints;
 
+import com.example.RoomBookingPortal.Models.DTOs.RoomDTO;
 import com.example.RoomBookingPortal.Services.RoomsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping("/rooms")

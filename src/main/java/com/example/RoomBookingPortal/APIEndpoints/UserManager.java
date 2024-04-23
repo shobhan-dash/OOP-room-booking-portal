@@ -1,6 +1,6 @@
-package com.example.RoomBookingPortal.APIEndpoints.UserAuth;
+package com.example.RoomBookingPortal.APIEndpoints;
 
-import com.example.RoomBookingPortal.DatabaseTables.User;
+import com.example.RoomBookingPortal.Models.DatabaseTables.User;
 import com.example.RoomBookingPortal.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

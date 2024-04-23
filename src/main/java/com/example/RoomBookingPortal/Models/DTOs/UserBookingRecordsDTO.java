@@ -1,15 +1,15 @@
-package com.example.RoomBookingPortal.APIEndpoints.Bookings;
+package com.example.RoomBookingPortal.Models.DTOs;
 
 import java.util.Date;
 
-public class BookingDTO {
+public class UserBookingRecordsDTO {
     private Long bookingID;
-    private Long userID;
     private Long roomID;
     private Date dateOfBooking;
     private String timeFrom;
     private String timeTo;
     private String purpose;
+    private String roomName;
 
     // Getters and setters
 
@@ -19,14 +19,6 @@ public class BookingDTO {
 
     public void setBookingID(Long bookingID) {
         this.bookingID = bookingID;
-    }
-
-    public Long getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Long userID) {
-        this.userID = userID;
     }
 
     public Long getRoomID() {
@@ -67,5 +59,13 @@ public class BookingDTO {
 
     public void setPurpose(String purpose) {
         this.purpose = purpose;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 }

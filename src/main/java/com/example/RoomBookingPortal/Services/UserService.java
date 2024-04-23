@@ -1,7 +1,7 @@
 package com.example.RoomBookingPortal.Services;
 
-import com.example.RoomBookingPortal.APIEndpoints.UserAuth.UserDTO;
-import com.example.RoomBookingPortal.DatabaseTables.User;
+import com.example.RoomBookingPortal.Models.DTOs.UserDTO;
+import com.example.RoomBookingPortal.Models.DatabaseTables.User;
 import com.example.RoomBookingPortal.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

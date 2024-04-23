@@ -1,5 +1,6 @@
-package com.example.RoomBookingPortal.APIEndpoints.Bookings;
+package com.example.RoomBookingPortal.APIEndpoints;
 
+import com.example.RoomBookingPortal.Models.DTOs.BookingDTO;
 import com.example.RoomBookingPortal.Services.BookingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

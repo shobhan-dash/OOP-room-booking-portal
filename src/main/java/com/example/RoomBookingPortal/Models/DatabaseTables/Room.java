@@ -1,4 +1,4 @@
-package com.example.RoomBookingPortal.DatabaseTables;
+package com.example.RoomBookingPortal.Models.DatabaseTables;
 
 import jakarta.persistence.*;
 

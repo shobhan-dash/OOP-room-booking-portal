@@ -1,4 +1,4 @@
-package com.example.RoomBookingPortal.APIEndpoints.UserAuth;
+package com.example.RoomBookingPortal.Models.DTOs;
 
 public class UserDTO {
     private Long userID;

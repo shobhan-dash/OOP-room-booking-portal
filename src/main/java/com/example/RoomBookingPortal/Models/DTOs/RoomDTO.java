@@ -1,4 +1,4 @@
-package com.example.RoomBookingPortal.APIEndpoints.Rooms;
+package com.example.RoomBookingPortal.Models.DTOs;
 
 public class RoomDTO {
     private Long roomID;

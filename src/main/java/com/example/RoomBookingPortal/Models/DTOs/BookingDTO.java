@@ -1,13 +1,11 @@
-package com.example.RoomBookingPortal.APIEndpoints.Rooms;
+package com.example.RoomBookingPortal.Models.DTOs;
 
 import java.util.Date;
 
-public class RoomFiltersDTO {
-    private Long roomID;
-    private int roomCapacity;
-
+public class BookingDTO {
     private Long bookingID;
     private Long userID;
+    private Long roomID;
     private Date dateOfBooking;
     private String timeFrom;
     private String timeTo;
@@ -29,6 +27,14 @@ public class RoomFiltersDTO {
 
     public void setUserID(Long userID) {
         this.userID = userID;
+    }
+
+    public Long getRoomID() {
+        return roomID;
+    }
+
+    public void setRoomID(Long roomID) {
+        this.roomID = roomID;
     }
 
     public Date getDateOfBooking() {
@@ -61,22 +67,5 @@ public class RoomFiltersDTO {
 
     public void setPurpose(String purpose) {
         this.purpose = purpose;
-    }
-
-    // Getters and setters
-    public Long getRoomID() {
-        return roomID;
-    }
-
-    public void setRoomID(Long roomID) {
-        this.roomID = roomID;
-    }
-
-    public int getRoomCapacity() {
-        return roomCapacity;
-    }
-
-    public void setRoomCapacity(int roomCapacity) {
-        this.roomCapacity = roomCapacity;
     }
 }

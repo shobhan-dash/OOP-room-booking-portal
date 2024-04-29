@@ -1,5 +1,7 @@
 package com.example.RoomBookingPortal.Models.DTOs;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BookingDTO {
@@ -41,7 +43,12 @@ public class BookingDTO {
         return dateOfBooking;
     }
 
-    public void setDateOfBooking(Date dateOfBooking) {
+    public String getDateOfBookingAsString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(dateOfBooking);
+    }
+
+    public void setDateOfBooking(Date dateOfBooking)  {
         this.dateOfBooking = dateOfBooking;
     }
 

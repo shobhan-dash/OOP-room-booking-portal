@@ -8,6 +8,8 @@ import com.example.RoomBookingPortal.Models.DatabaseTables.User;
 import com.example.RoomBookingPortal.Repositories.BookingsRepository;
 import com.example.RoomBookingPortal.Repositories.RoomsRepository;
 import com.example.RoomBookingPortal.Repositories.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,11 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 @Service
 public class BookingsService {
@@ -38,7 +41,8 @@ public class BookingsService {
         // Check if the room exists
         Optional<Room> optionalRoom = roomsRepository.findById(bookingDTO.getRoomID());
         if (optionalRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
         }
 
         Room room = optionalRoom.get();
@@ -46,23 +50,21 @@ public class BookingsService {
         // Check if the user exists
         Optional<User> optionalUser = usersRepository.findById(bookingDTO.getUserID());
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
         }
 
         User user = optionalUser.get();
 
-        // Validate date format
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            dateFormat.setLenient(false);
-            String formattedDate = dateFormat.format(bookingDTO.getDateOfBooking());
-            if (!formattedDate.equals(bookingDTO.getDateOfBooking().toString())) {
-                // The formatted date does not match the input date string exactly (Eg: 2024-04-35)
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
-        }
+        ObjectNode response = new ObjectMapper().createObjectNode();
+
+//        try {
+//            // Validate date format for illegal dates
+//            if(!Objects.equals(bookingDTO.getDateOfBookingAsString(), bookingDTO.getDateOfBooking().toString())) throw new Exception("Invalid date/time");
+//        } catch (Exception e) {
+//            response.put("Error", "Invalid date/time" + bookingDTO.getDateOfBookingAsString() + " " + bookingDTO.getDateOfBooking().toString());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
 
         // Validate time format
         try {
@@ -71,12 +73,14 @@ public class BookingsService {
             timeFormat.parse(bookingDTO.getTimeFrom());
             timeFormat.parse(bookingDTO.getTimeTo());
         } catch (ParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         // Check if timeFrom is before timeTo
         if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         // Check room availability
@@ -88,7 +92,8 @@ public class BookingsService {
         );
 
         if (!conflictingBookings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Room unavailable");
+            response.put("Error", "Room unavailable");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         // Create and save the booking
@@ -104,17 +109,14 @@ public class BookingsService {
         return ResponseEntity.status(HttpStatus.OK).body("Booking created successfully");
     }
 
+
     public ResponseEntity<?> editBooking(BookingDTO bookingDTO) {
-        // Check if the booking exists
-        Booking booking = bookingsRepository.findById(bookingDTO.getBookingID()).orElse(null);
-        if (booking == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking does not exist");
-        }
 
         // Check if the user exists
         Optional<User> optionalUser = usersRepository.findById(bookingDTO.getUserID());
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
         }
 
         User user = optionalUser.get();
@@ -122,7 +124,15 @@ public class BookingsService {
         // Check if the room exists
         Optional<Room> optionalRoom = roomsRepository.findById(bookingDTO.getRoomID());
         if (optionalRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
+        }
+
+        // Check if the booking exists
+        Booking booking = bookingsRepository.findById(bookingDTO.getBookingID()).orElse(null);
+        if (booking == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Booking does not exist"));
         }
 
         Room room = optionalRoom.get();
@@ -137,7 +147,8 @@ public class BookingsService {
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));
         }
 
 
@@ -148,13 +159,8 @@ public class BookingsService {
             timeFormat.parse(bookingDTO.getTimeFrom());
             timeFormat.parse(bookingDTO.getTimeTo());
         } catch (ParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
-        }
-
-        // Check if timeFrom is before timeTo
-        if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date/time");
-        }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));        }
 
         // Check room availability
         List<Booking> conflictingBookings = bookingsRepository.findConflictingBookingsExcludeCurrent(
@@ -166,8 +172,13 @@ public class BookingsService {
         );
 
         if (!conflictingBookings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Room unavailable");
-        }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Room unavailable"));        }
+
+        // Check if timeFrom is before timeTo
+        if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));        }
 
         // Update booking details
         booking.setUser(user);
@@ -188,10 +199,12 @@ public class BookingsService {
                 bookingsRepository.deleteById(bookingID);
                 return ResponseEntity.status(HttpStatus.OK).body("Booking deleted successfully");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking does not exist");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ObjectMapper().createObjectNode().put("Error", "Booking does not exist"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Booking does not exist"));
         }
     }
 
@@ -199,7 +212,7 @@ public class BookingsService {
     public ResponseEntity<?> getUpcomingBookings(Long userID) {
         Optional<User> optionalUser = usersRepository.findById(userID);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
         }
 
         List<Booking> upcomingBookings = bookingsRepository.findUpcomingBookings(userID);
@@ -209,14 +222,16 @@ public class BookingsService {
             UserBookingRecordsDTO bookingDTO = new UserBookingRecordsDTO();
 
             // Fetch the Room entity or RoomDTO and set roomName
-            Optional<Room> optionalRoom = roomsRepository.findById(booking.getRoom().getRoomID());
+            Optional<Room> optionalRoom = roomsRepository.findById(booking.getUser().getUserID());
             if (optionalRoom.isPresent()) {
                 bookingDTO.setRoomName(optionalRoom.get().getRoomName());
                 bookingDTO.setRoomID(optionalRoom.get().getRoomID());
             }
-            else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
-            }
+
+            // No longer required. Edited out by sir
+//            else{
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
+//            }
 
             bookingDTO.setBookingID(booking.getBookingID());
             bookingDTO.setDateOfBooking(booking.getDateOfBooking());
@@ -230,11 +245,10 @@ public class BookingsService {
     }
 
 
-
     public ResponseEntity<?> getBookingHistory(Long userID) {
         Optional<User> optionalUser = usersRepository.findById(userID);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
         }
 
         List<Booking> bookingHistory = bookingsRepository.findBookingHistory(userID);
@@ -244,14 +258,16 @@ public class BookingsService {
             UserBookingRecordsDTO bookingDTO = new UserBookingRecordsDTO();
 
             // Fetch the Room entity or RoomDTO and set roomName
-            Optional<Room> optionalRoom = roomsRepository.findById(booking.getRoom().getRoomID());
+            Optional<Room> optionalRoom = roomsRepository.findById(booking.getUser().getUserID());
             if (optionalRoom.isPresent()) {
                 bookingDTO.setRoomName(optionalRoom.get().getRoomName());
                 bookingDTO.setRoomID(optionalRoom.get().getRoomID());
             }
-            else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
-            }
+
+            // No need to check for room. Was edited out by sir
+//            else{
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
+//            }
 
             bookingDTO.setBookingID(booking.getBookingID());
             bookingDTO.setDateOfBooking(booking.getDateOfBooking());

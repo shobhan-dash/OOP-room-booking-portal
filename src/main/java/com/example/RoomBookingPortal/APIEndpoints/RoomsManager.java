@@ -33,7 +33,7 @@ public class RoomsManager {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteRoom(@RequestBody RoomDTO roomDTO) {
-        return roomsService.deleteRoom(roomDTO.getRoomID());
+    public ResponseEntity<?> deleteRoom(@RequestParam Long roomID) {
+        return roomsService.deleteRoom(roomID);
     }
 }

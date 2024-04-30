@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RoomsService {
@@ -103,6 +104,11 @@ public class RoomsService {
                     .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
         }
 
+        if(roomsRepository.existsByRoomName(roomDTO.getRoomName())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Room with given name already exists"));
+        }
+
         if (roomDTO.getRoomCapacity() <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ObjectMapper().createObjectNode().put("Error", "Invalid capacity"));
@@ -116,12 +122,13 @@ public class RoomsService {
     }
 
     public ResponseEntity<?> deleteRoom(Long roomID) {
-        if (roomsRepository.existsById(roomID)) {
-            roomsRepository.deleteById(roomID);
+        Optional<Room> optionalRoom = roomsRepository.findRoomById(roomID);
+        if (optionalRoom.isPresent()) {
+            roomsRepository.deleteRoomById(roomID);
             return ResponseEntity.status(HttpStatus.OK).body("Room deleted successfully");
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
     }
 }

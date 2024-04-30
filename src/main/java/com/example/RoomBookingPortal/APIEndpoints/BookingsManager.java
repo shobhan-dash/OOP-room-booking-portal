@@ -27,8 +27,8 @@ public class BookingsManager {
     }
 
     @DeleteMapping("/book")
-    public ResponseEntity<?> deleteBooking(@RequestBody BookingDTO bookingDTO) {
-        return bookingsService.deleteBooking(bookingDTO.getBookingID());
+    public ResponseEntity<?> deleteBooking(@RequestParam Long bookingID) {
+        return bookingsService.deleteBooking(bookingID);
     }
 
     @GetMapping("/upcoming")

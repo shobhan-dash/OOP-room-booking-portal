@@ -143,19 +143,6 @@ public class BookingsService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        // Validate date format
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            dateFormat.setLenient(false);
-            String formattedDate = dateFormat.format(bookingDTO.getDateOfBooking());
-            if (!formattedDate.equals(bookingDTO.getDateOfBooking().toString())) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException e) {
-            response.put("Error", "Invalid date/time");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
         // Validate time format
         try {
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");

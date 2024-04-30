@@ -19,7 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -37,26 +36,25 @@ public class BookingsService {
     }
 
     public ResponseEntity<?> createBooking(BookingDTO bookingDTO) {
-        // Check if the room exists
-        Optional<Room> optionalRoom = roomsRepository.findById(bookingDTO.getRoomID());
-        if (optionalRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
-        }
-
-        Room room = optionalRoom.get();
+        ObjectNode response = new ObjectMapper().createObjectNode();
 
         // Check if the user exists
         Optional<User> optionalUser = usersRepository.findById(bookingDTO.getUserID());
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
+            response.put("Error", "User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         User user = optionalUser.get();
 
-        ObjectNode response = new ObjectMapper().createObjectNode();
+        // Check if the room exists
+        Optional<Room> optionalRoom = roomsRepository.findById(bookingDTO.getRoomID());
+        if (optionalRoom.isEmpty()) {
+            response.put("Error", "Room does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
 
+        Room room = optionalRoom.get();
 
         // Prevent Bookings in the past
         Instant instant = bookingDTO.getDateOfBooking().toInstant();
@@ -72,7 +70,6 @@ public class BookingsService {
             response.put("Error", "Invalid date/time");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
 
         // Validate time format
         try {
@@ -119,12 +116,13 @@ public class BookingsService {
 
 
     public ResponseEntity<?> editBooking(BookingDTO bookingDTO) {
+        ObjectNode response = new ObjectMapper().createObjectNode();
 
         // Check if the user exists
         Optional<User> optionalUser = usersRepository.findById(bookingDTO.getUserID());
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
+            response.put("Error", "User does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         User user = optionalUser.get();
@@ -132,18 +130,18 @@ public class BookingsService {
         // Check if the room exists
         Optional<Room> optionalRoom = roomsRepository.findById(bookingDTO.getRoomID());
         if (optionalRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Room does not exist"));
+            response.put("Error", "Room does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+
+        Room room = optionalRoom.get();
 
         // Check if the booking exists
         Booking booking = bookingsRepository.findById(bookingDTO.getBookingID()).orElse(null);
         if (booking == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Booking does not exist"));
+            response.put("Error", "Booking does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
-        Room room = optionalRoom.get();
 
         // Validate date format
         try {
@@ -151,14 +149,12 @@ public class BookingsService {
             dateFormat.setLenient(false);
             String formattedDate = dateFormat.format(bookingDTO.getDateOfBooking());
             if (!formattedDate.equals(bookingDTO.getDateOfBooking().toString())) {
-                // The formatted date does not match the input date string exactly (Eg: 2024-04-35)
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
 
         // Validate time format
         try {
@@ -167,8 +163,15 @@ public class BookingsService {
             timeFormat.parse(bookingDTO.getTimeFrom());
             timeFormat.parse(bookingDTO.getTimeTo());
         } catch (ParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));        }
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // Check if timeFrom is before timeTo
+        if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         // Check room availability
         List<Booking> conflictingBookings = bookingsRepository.findConflictingBookingsExcludeCurrent(
@@ -180,13 +183,9 @@ public class BookingsService {
         );
 
         if (!conflictingBookings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Room unavailable"));        }
-
-        // Check if timeFrom is before timeTo
-        if (bookingDTO.getTimeFrom().compareTo(bookingDTO.getTimeTo()) >= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid date/time"));        }
+            response.put("Error", "Room unavailable");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         // Update booking details
         booking.setUser(user);
@@ -266,11 +265,6 @@ public class BookingsService {
                 bookingDTO.setRoomName(optionalRoom.get().getRoomName());
                 bookingDTO.setRoomID(optionalRoom.get().getRoomID());
             }
-
-            // No need to check for room. Was edited out by sir
-//            else{
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
-//            }
 
             bookingDTO.setBookingID(booking.getBookingID());
             bookingDTO.setDateOfBooking(booking.getDateOfBooking());

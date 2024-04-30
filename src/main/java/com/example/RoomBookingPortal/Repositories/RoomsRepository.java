@@ -1,8 +1,13 @@
 package com.example.RoomBookingPortal.Repositories;
 
+import com.example.RoomBookingPortal.Models.DTOs.RoomDTO;
+import com.example.RoomBookingPortal.Models.DTOs.RoomFiltersDTO;
 import com.example.RoomBookingPortal.Models.DatabaseTables.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomsRepository extends JpaRepository<Room, Long> {
@@ -10,5 +15,9 @@ public interface RoomsRepository extends JpaRepository<Room, Long> {
 
     boolean existsByRoomName(String roomName);
 
-//    List<RoomFiltersDTO> getRooms(Date date, String time, Integer capacity);
+    @Query("SELECT r FROM Room r WHERE r.roomCapacity >= :roomCapacity")
+    List<Room> findByCapacity(@Param("roomCapacity") Integer roomCapacity);
+
+    @Query("SELECT r FROM Room r")
+    List<Room> findAllRooms();
 }

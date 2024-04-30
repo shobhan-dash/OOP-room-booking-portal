@@ -17,12 +17,10 @@ public class RoomsManager {
         this.roomsService = roomsService;
     }
 
-//    @GetMapping
-//    public ResponseEntity<?> getRoom(@RequestParam(required = false) Date date,
-//                                     @RequestParam(required = false) String time,
-//                                     @RequestParam(required = false) Integer capacity) {
-//         return roomsService.getRoom(date, time, capacity);
-//    }
+    @GetMapping
+    public ResponseEntity<?> getRoom(@RequestParam(required = false) Integer roomCapacity) {
+         return roomsService.getRoom(roomCapacity);
+    }
 
     @PostMapping
     public ResponseEntity<?> addRoom(@RequestBody RoomDTO roomDTO) {

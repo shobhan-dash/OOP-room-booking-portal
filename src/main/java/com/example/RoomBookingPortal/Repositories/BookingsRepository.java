@@ -13,16 +13,30 @@ import java.util.List;
 
 public interface BookingsRepository extends JpaRepository<Booking, Long> {
 
+//    @Query("SELECT b FROM Booking b WHERE b.room.roomID = :roomID " +
+//            "AND b.dateOfBooking = :dateOfBooking " +
+//            "AND ((b.timeFrom <= :timeTo AND b.timeTo >= :timeFrom) " +
+//            "OR (b.timeFrom >= :timeFrom AND b.timeFrom <= :timeTo))")
+//    List<Booking> findConflictingBookings(
+//            @Param("roomID") Long roomID,
+//            @Param("dateOfBooking") Date dateOfBooking,
+//            @Param("timeFrom") String timeFrom,
+//            @Param("timeTo") String timeTo
+//    );
+
+    // EDIT IN QUESTION: timeFrom of the next meeting can be equal to timeTo of prev one
+    //TODO: Fix this, not yet happening
     @Query("SELECT b FROM Booking b WHERE b.room.roomID = :roomID " +
             "AND b.dateOfBooking = :dateOfBooking " +
-            "AND ((b.timeFrom <= :timeTo AND b.timeTo >= :timeFrom) " +
-            "OR (b.timeFrom >= :timeFrom AND b.timeFrom <= :timeTo))")
+            "AND ((b.timeFrom < :timeTo AND b.timeTo > :timeFrom) " +
+            "OR (b.timeFrom = :timeTo OR b.timeTo = :timeFrom))")
     List<Booking> findConflictingBookings(
             @Param("roomID") Long roomID,
             @Param("dateOfBooking") Date dateOfBooking,
             @Param("timeFrom") String timeFrom,
             @Param("timeTo") String timeTo
     );
+
 
     @Query("SELECT b FROM Booking b WHERE b.room.roomID = :roomID " +
             "AND b.dateOfBooking = :dateOfBooking " +

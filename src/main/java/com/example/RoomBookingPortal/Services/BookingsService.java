@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -58,13 +57,22 @@ public class BookingsService {
 
         ObjectNode response = new ObjectMapper().createObjectNode();
 
-//        try {
-//            // Validate date format for illegal dates
-//            if(!Objects.equals(bookingDTO.getDateOfBookingAsString(), bookingDTO.getDateOfBooking().toString())) throw new Exception("Invalid date/time");
-//        } catch (Exception e) {
-//            response.put("Error", "Invalid date/time" + bookingDTO.getDateOfBookingAsString() + " " + bookingDTO.getDateOfBooking().toString());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
+
+        // Prevent Bookings in the past
+        Instant instant = bookingDTO.getDateOfBooking().toInstant();
+        LocalDateTime dateOfBooking = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalTime timeFrom = LocalTime.parse(bookingDTO.getTimeFrom(), DateTimeFormatter.ofPattern("HH:mm:ss"));
+        LocalTime timeTo = LocalTime.parse(bookingDTO.getTimeTo(), DateTimeFormatter.ofPattern("HH:mm:ss"));
+        LocalDateTime dateTimeFrom = LocalDateTime.of(dateOfBooking.toLocalDate(), timeFrom);
+        LocalDateTime dateTimeTo = LocalDateTime.of(dateOfBooking.toLocalDate(), timeTo);
+
+        if (dateTimeFrom.isBefore(currentDateTime) || dateTimeTo.isBefore(currentDateTime)) {
+            response.put("Error", "Invalid date/time");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
 
         // Validate time format
         try {
@@ -227,11 +235,6 @@ public class BookingsService {
                 bookingDTO.setRoomName(optionalRoom.get().getRoomName());
                 bookingDTO.setRoomID(optionalRoom.get().getRoomID());
             }
-
-            // No longer required. Edited out by sir
-//            else{
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room does not exist");
-//            }
 
             bookingDTO.setBookingID(booking.getBookingID());
             bookingDTO.setDateOfBooking(booking.getDateOfBooking());

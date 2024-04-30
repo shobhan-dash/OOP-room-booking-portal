@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -62,6 +65,25 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
 
         return ResponseEntity.ok(userDTO);
+    }
+
+    public ResponseEntity<?> fetchAllUsers() {
+        try {
+            List<User> users = userRepository.findAllUsers();
+
+            List<UserDTO> userList = new ArrayList<>();
+            for(User user : users){
+                UserDTO u = new UserDTO();
+                u.setName(user.getName());
+                u.setUserID(user.getUserID());
+                u.setEmail(user.getEmail());
+                userList.add(u);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(userList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ObjectMapper().createObjectNode().put("Error", "User does not exist"));
+        }
     }
 
 

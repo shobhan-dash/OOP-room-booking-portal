@@ -1,6 +1,7 @@
 package com.example.RoomBookingPortal.Services;
 
 import com.example.RoomBookingPortal.Models.DTOs.RoomDTO;
+import com.example.RoomBookingPortal.Models.DTOs.RoomFiltersDTO;
 import com.example.RoomBookingPortal.Models.DatabaseTables.Room;
 import com.example.RoomBookingPortal.Repositories.RoomsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RoomsService {
@@ -19,14 +22,22 @@ public class RoomsService {
         this.roomsRepository = roomsRepository;
     }
 
-//    public ResponseEntity<?> getRoom(Date date, String time, Integer capacity){
-//        if (date == null && time == null && capacity == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
-//        }
-//
-//        List<RoomFiltersDTO> rooms = roomsRepository.getRooms(date, time, capacity);
-//        return ResponseEntity.status(HttpStatus.OK).body(rooms);
-//    }
+    public ResponseEntity<?> getRoom(Integer roomCapacity) {
+        if (roomCapacity != null && roomCapacity <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ObjectMapper().createObjectNode().put("Error", "Invalid parameters"));
+        }
+
+        List<Room> rooms;
+        if (roomCapacity != null) {
+            rooms = roomsRepository.findByCapacity(roomCapacity);
+        } else {
+            rooms = roomsRepository.findAllRooms(); // Fetch all rooms if capacity not specified
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(rooms);
+    }
+
     public ResponseEntity<?> addRoom(RoomDTO roomDTO) {
         if (roomsRepository.existsByRoomName(roomDTO.getRoomName())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)

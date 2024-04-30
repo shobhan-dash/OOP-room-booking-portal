@@ -30,4 +30,11 @@ public class UserManager {
     public ResponseEntity<?> getUserDetails(@RequestParam Long userID) {
         return userService.getUser(userID);
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        return userService.fetchAllUsers();
+    }
+
+
 }
